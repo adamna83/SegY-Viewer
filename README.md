@@ -1,0 +1,2 @@
+# SegY-Viewer
+SegY Viewer
