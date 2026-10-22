@@ -1,0 +1,94 @@
+/*
+ * myPETRONAS brand layer — drop-in stylesheet
+ * PETRONAS teal (#00a19c) + Inter (self-hosted). Offline/LAN safe, no CDN.
+ *
+ * Usage:
+ *   1. Copy this file to your project (e.g. web/brand.css or styles.css).
+ *   2. Copy templates/fonts/ next to it, keeping the "fonts/" subfolder name.
+ *      (font URLs below are relative to this CSS file.)
+ *   3. <link rel="stylesheet" href="brand.css"> after any reset.
+ *
+ * Tune everything from the :root tokens below — do not hard-code hex elsewhere.
+ */
+
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('fonts/inter-latin-wght-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('fonts/inter-latin-ext-wght-normal.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
+:root{
+  /* Brand */
+  --brand:#00a19c;          /* primary PETRONAS teal — headers, buttons, links */
+  --brand-hover:#00847c;    /* hover / pressed */
+  --brand-dark:#00483f;     /* deep teal — text on light, strong headings */
+  --brand-tint:#dff1f1;     /* faint teal — table header, hovers */
+  --brand-tint2:#e0f3f3;    /* faint teal — badges/chips */
+
+  /* Surfaces */
+  --bg:#00a19c;             /* app header bar (teal) */
+  --surface:#ffffff;        /* cards, panels */
+  --page:#f0f2f5;           /* page background */
+
+  /* Text */
+  --text:#2c2926;           /* default body text (warm charcoal) */
+  --muted:#6c737a;          /* secondary text */
+  --line:#d3dee8;           /* borders / dividers */
+
+  /* Semantic status (keep these meanings) */
+  --ok:#166534; --ok-bg:#dcfce7;
+  --warn:#854d0e; --warn-bg:#fef9c3;
+  --danger:#b91c1c;
+
+  --radius:10px; --radius-sm:8px;
+  --font:'Inter',system-ui,'Segoe UI',Arial,sans-serif;
+}
+
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);background:var(--page);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--brand-hover)}a:hover{color:var(--brand-dark)}
+
+/* Header — brand teal bar, white text */
+header{background:var(--bg);color:#fff}
+header .wrap{max-width:1280px;margin:0 auto;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+header h1{margin:0;font-size:22px;font-weight:700}
+.pill{background:#fff;color:#00706a;font-size:12px;font-weight:600;padding:2px 8px;border-radius:20px;vertical-align:middle}
+.sub{color:rgba(255,255,255,.88);margin:4px 0}
+header button{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:inherit}
+header button:hover{background:rgba(255,255,255,.28)}
+
+.wrap{max-width:1280px;margin:0 auto;padding:16px}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.card h2{margin:0 0 10px;font-size:17px}
+
+/* KPI tiles */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px}
+.kpi b{font-size:24px;display:block}.kpi span{color:var(--muted);font-size:12px}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--brand-tint);position:sticky;top:0}
+.tablewrap{max-height:560px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+
+/* Buttons */
+.btn{background:var(--brand);color:#fff;border:0;border-radius:7px;padding:6px 10px;cursor:pointer;font-size:12px;margin:1px 2px;font-family:inherit}
+.btn:hover{background:var(--brand-hover)}
+.btn.ghost{background:#eaf6f5;color:#005f58;border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--brand-tint);color:var(--brand-dark)}
+
+/* Badges / chips */
+.badge{display:inline-block;background:var(--brand-tint2);color:#00645c;border-radius:20px;padding:1px 8px;font-size:11px;margin:1px 2px;white-space:nowrap}
+.badge.ok{background:var(--ok-bg);color:var(--ok)}
+.badge.warn{background:var(--warn-bg);color:var(--warn)}
+
+/* Inputs */
+input,select,textarea{font-family:inherit}
+input[type=search],input[type=text],select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px}
+
+/* Misc */
+.muted{color:var(--muted)}.small{font-size:12px}
+code{background:var(--page);padding:1px 5px;border-radius:5px;font-size:12px;font-family:'Inter',Consolas,monospace}
+.unc{font-family:Consolas,'Inter',monospace;font-size:12px;word-break:break-all;background:#f6fbfb;border:1px dashed var(--line);padding:8px;border-radius:8px}
+.kv{display:grid;grid-template-columns:180px 1fr;gap:6px;font-size:14px}
+.kv dt{color:var(--muted)}.kv dd{margin:0;word-break:break-all}

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEG-Y Studio — Marine Site Survey</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2300a19c'/%3E%3Cpath d='M6 20c4-8 8 8 12 0s6 2 8-2' stroke='%23fff' stroke-width='2.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<header class="appbar">
+  <div class="bar-left">
+    <div class="mark">Geoscience Solutions</div>
+    <div class="titles">
+      <h1>SEG-Y Studio</h1>
+      <div class="sub">Marine site survey · viewer, QC &amp; trace conditioning</div>
+    </div>
+  </div>
+  <div class="bar-right">
+    <span class="pill" id="enginePill">offline</span>
+    <button id="openBtn" title="Open one or more SEG-Y files">Open files</button>
+    <button id="folderBtn" title="Open a folder of SEG-Y files">Open folder</button>
+    <button id="serverBtn" title="Browse the survey drive through the local server">Browse drive</button>
+  </div>
+</header>
+
+<main class="app">
+  <!-- ------------------------------------------------ left -->
+  <aside class="panel left">
+    <div class="ph">Data <span class="badge" id="fileCount">0 files</span></div>
+    <div class="pb pb-tight">
+      <div id="fileList" class="filelist"><div class="empty">No files loaded.<br><span class="muted small">Drop .sgy files anywhere or use Open files.</span></div></div>
+    </div>
+    <div class="ph">Dataset</div>
+    <div class="pb"><div id="info" class="muted small">Nothing loaded.</div></div>
+    <div class="ph">Trace inspector</div>
+    <div class="pb"><div id="traceInfo" class="muted small">Click the section to inspect a trace.</div></div>
+    <div class="ph">Text header</div>
+    <div class="pb"><pre id="textHead" class="texthead muted small">—</pre></div>
+  </aside>
+
+  <!-- ------------------------------------------------ centre -->
+  <section class="center">
+    <div class="toolbar">
+      <div class="grp">
+        <label for="gainSel">Display gain</label>
+        <select id="gainSel">
+          <option value="clip">Clip</option>
+          <option value="agc">AGC</option>
+          <option value="tgain">T^n</option>
+        </select>
+      </div>
+      <div class="grp" id="clipGrp">
+        <label for="clipPct">Clip %</label>
+        <input id="clipPct" type="number" min="80" max="99.99" step="0.1" value="99">
+      </div>
+      <div class="grp" id="agcGrp" hidden>
+        <label for="agcWin">AGC window (ms)</label>
+        <input id="agcWin" type="number" min="5" max="5000" step="5" value="100">
+      </div>
+      <div class="grp" id="tgainGrp" hidden>
+        <label for="tgainPow">T^n power</label>
+        <input id="tgainPow" type="number" min="0" max="4" step="0.1" value="1">
+      </div>
+      <div class="grp">
+        <label for="cmapSel">Palette</label>
+        <select id="cmapSel">
+          <option value="seismic">Blue / white / red</option>
+          <option value="gray">Greyscale</option>
+          <option value="teal">Deep teal / gold</option>
+          <option value="fire">Black / ember</option>
+        </select>
+      </div>
+      <div class="grp">
+        <label for="headerSel">Header curve</label>
+        <select id="headerSel"></select>
+      </div>
+      <label class="chk"><input type="checkbox" id="wiggleChk"> Wiggle</label>
+      <label class="chk"><input type="checkbox" id="gridChk" checked> Grid</label>
+      <div class="spacer"></div>
+      <div class="zoomgrp" role="group" aria-label="Zoom">
+        <button class="btn ghost" id="zTimeOut" title="Zoom out (time)">T −</button>
+        <button class="btn ghost" id="zTimeIn" title="Zoom in (time)">T +</button>
+        <button class="btn ghost" id="zTraceOut" title="Zoom out (traces)">Tr −</button>
+        <button class="btn ghost" id="zTraceIn" title="Zoom in (traces)">Tr +</button>
+        <button class="btn ghost" id="fitBtn">Fit</button>
+      </div>
+      <div class="seg" id="modeSeg" hidden>
+        <button data-mode="original" class="on">Original</button>
+        <button data-mode="processed">Processed</button>
+      </div>
+    </div>
+
+    <div class="view">
+      <canvas id="hdr" class="hdr"></canvas>
+      <div class="seisWrap"><canvas id="seis"></canvas></div>
+      <canvas id="axis" class="axis"></canvas>
+    </div>
+
+    <div class="statusbar">
+      <span id="readout" class="mono">—</span>
+      <span class="spacer"></span>
+      <span id="viewinfo" class="muted small"></span>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------ right -->
+  <aside class="panel right">
+    <div class="ph">Processing chain <span class="badge" id="chainCount">empty</span></div>
+    <div class="pb">
+      <div class="row">
+        <select id="presetSel" class="grow">
+          <option value="">Presets…</option>
+          <option value="sparker">Sparker (single channel)</option>
+          <option value="hr2d">2DHR migrated stack</option>
+          <option value="minimal">Minimal conditioning</option>
+        </select>
+        <button class="btn ghost" id="presetBtn">Load</button>
+      </div>
+      <div id="chain" class="chain"></div>
+      <div class="row addrow">
+        <select id="stepType" class="grow"></select>
+        <button class="btn" id="addStepBtn">Add step</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="applyBtn" disabled>Apply chain</button>
+        <button class="btn ghost" id="cancelBtn" disabled>Cancel</button>
+        <button class="btn ghost" id="clearBtn">Clear</button>
+      </div>
+      <div id="progWrap" class="prog" hidden>
+        <div class="progbar"><div id="progBar"></div></div>
+        <div id="progText" class="small muted">idle</div>
+      </div>
+    </div>
+
+    <div class="ph">Amplitude spectrum</div>
+    <div class="pb"><canvas id="spec" class="spec"></canvas><div id="specNote" class="small muted"></div></div>
+
+    <div class="ph">Export</div>
+    <div class="pb">
+      <div class="row">
+        <button class="btn" id="exportSegyBtn" disabled>SEG-Y</button>
+        <button class="btn ghost" id="exportPngBtn" disabled>PNG</button>
+        <button class="btn ghost" id="exportCsvBtn" disabled>Headers CSV</button>
+      </div>
+      <div class="small muted" id="exportNote">Exports the data currently displayed.</div>
+    </div>
+  </aside>
+</main>
+
+<input type="file" id="fileInput" accept=".sgy,.segy,.SGY,.SEGY" multiple hidden>
+<input type="file" id="folderInput" webkitdirectory directory multiple hidden>
+
+<div id="dropOverlay" class="dropOverlay" hidden><div>Drop SEG-Y files to load</div></div>
+
+<div id="modal" class="modal" hidden>
+  <div class="modalCard">
+    <div class="modalHead">
+      <b id="modalTitle">Browse</b>
+      <button class="btn ghost" id="modalClose">Close</button>
+    </div>
+    <div class="modalBody" id="modalBody"></div>
+  </div>
+</div>
+
+<script src="js/segy.js"></script>
+<script src="js/dsp.js"></script>
+<script src="js/render.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
