@@ -3,6 +3,8 @@
 Browser-based SEG-Y viewer and light trace-conditioning tool for marine site
 survey QC. Runs entirely client-side: files never leave the machine.
 
+Live: https://segy-viewer.netlify.app
+
 Styled to the myPETRONAS palette (teal `#00a19c`, self-hosted Inter).
 
 ## Quick start

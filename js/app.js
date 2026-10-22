@@ -796,10 +796,10 @@
     $('fileInput').addEventListener('change', e => { loadFiles(e.target.files); e.target.value = ''; });
     $('folderInput').addEventListener('change', e => { loadFiles(e.target.files); e.target.value = ''; });
 
-    // server browse
+    // server browse (only when the local Python server answers)
     const isHttp = /^https?:$/.test(location.protocol);
-    $('serverBtn').hidden = !isHttp;
-    $('enginePill').textContent = isHttp ? 'local server' : 'offline · file://';
+    $('serverBtn').hidden = true;
+    $('enginePill').textContent = 'offline';
     $('serverBtn').addEventListener('click', () => browse(state.serverPath));
     $('modalClose').addEventListener('click', closeModal);
     $('modal').addEventListener('click', e => { if (e.target === $('modal')) closeModal(); });
@@ -939,10 +939,17 @@
 
     renderFileList();
     clearUI();
-    if (isHttp) {
-      fetch('/api/ping').then(r => r.ok && r.json()).then(j => {
-        if (j && j.root) { state.serverPath = j.root; }
-      }).catch(() => {});
+    if (isHttp && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
+      fetch('/api/ping').then(r => {
+        if (!r.ok) throw new Error('static hosting');
+        return r.json();
+      }).then(j => {
+        if (j && j.ok) {
+          state.serverPath = j.root;
+          $('serverBtn').hidden = false;
+          $('enginePill').textContent = 'local server';
+        }
+      }).catch(() => { /* static hosting: no drive browse */ });
     }
   }
 
